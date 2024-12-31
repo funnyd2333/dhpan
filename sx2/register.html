@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>注册界面</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  .register-container {
+    max-width: 360px;
+    margin: 50px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .register-container:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    color: #666;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-image: linear-gradient(to right, #5cb85c, #4cae4c);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-image 0.3s ease;
+  }
+
+  button:hover {
+    background-image: linear-gradient(to right, #4cae4c, #5cb85c);
+  }
+
+  h1 {
+    margin-bottom: 30px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="register-container">
+  <h1>注册</h1>
+  <form id="registerForm">
+    <div class="form-group">
+      <label for="username">用户名:</label>
+      <input type="text" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">密码:</label>
+      <input type="password" id="password" required>
+    </div>
+    <div class="form-group">
+      <label for="confirmPassword">确认密码:</label>
+      <input type="password" id="confirmPassword" required>
+    </div>
+    <div class="form-group">
+      <button type="submit">注册</button>
+    </div>
+  </form>
+</div>
+
+<script>
+ document.getElementById('registerForm').onsubmit = function(event) {
+  event.preventDefault();
+ 
+  // 获取输入值
+  var username = document.getElementById('username').value;
+  var password = document.getElementById('password').value;
+  var confirmPassword = document.getElementById('confirmPassword').value;
+
+  // 简单的密码确认逻辑
+  if (password !== confirmPassword) {
+    alert('密码和确认密码不匹配！');
+    return;
+  }
+
+  // 构建请求体
+  var userData = {
+    username: username,
+    password: password
+  };
+
+  // 使用fetch API发送POST请求到后端API
+  fetch('http://127.0.0.1:9092/user/register', {
+    method: 'POST', // 指定请求方法为POST
+    headers: {
+      'Content-Type': 'application/json' // 设置请求头，告诉服务器发送的是JSON格式的数据
+    },
+    body: JSON.stringify(userData) // 将JavaScript对象转换为JSON字符串
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('注册失败，服务器响应状态码：' + response.status);
+    }
+    return response.json(); // 解析JSON格式的响应体
+  })
+  .then(data => {
+    console.log('注册成功，服务器返回的数据:', data);
+    // 注册成功后，可以跳转到登录界面
+    window.location.href = '/sx2/login.html';
+  })
+  .catch(error => {
+    console.error('注册过程中发生错误:', error);
+    alert(error.message);
+  });
+};
+
+</script>
+
+</body>
+</html>

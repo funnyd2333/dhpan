@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简易网盘系统</title>
+<style>
+  body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  #fileInput {
+    margin-bottom: 20px;
+  }
+  button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  button:hover {
+    background-color: #4cae4c;
+  }
+  .file-list {
+    margin-top: 20px;
+  }
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+  }
+  .file-info {
+    flex-grow: 1;
+  }
+  .file-info span {
+    margin-right: 15px;
+    color: #666;
+  }
+  .file-actions button {
+    background-color: #f0ad4e;
+    margin-left: 5px;
+  }
+  .file-actions button:hover {
+    background-color: #eea236;
+  }
+  .file-actions button:first-child {
+    background-color: #0275d8;
+  }
+  .file-actions button:first-child:hover {
+    background-color: #025aa5;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>简易网盘系统</h1>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadFile()">上传文件</button>
+  <div class="file-list" id="fileList"></div>
+  <!-- 添加跳转按钮 -->
+  <button onclick="gotoManager()">跳转到网盘管理中心</button>
+</div>
+
+<script>
+  function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('请选择文件！');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('http://127.0.0.1:9092/file/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('文件上传成功', data);
+      addFileToList(file);
+    })
+    .catch(error => {
+      console.error('文件上传失败', error);
+      alert('文件上传失败！');
+    });
+  }
+
+  function addFileToList(file) {
+    const fileList = document.getElementById('fileList');
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.innerHTML = `
+      <div class="file-info">
+        <span>${file.name}</span>
+        <span>${(file.size / 1024).toFixed(2)} KB</span>
+      </div>
+      <div class="file-actions">
+        <button onclick="downloadFile('${file.name}')">下载</button>
+        <button onclick="renameFile('${file.name}')">重命名</button>
+        <button onclick="deleteFile('${file.name}')">删除</button>
+      </div>
+    `;
+    fileList.appendChild(fileItem);
+  }
+
+  function downloadFile(fileName) {
+    console.log('文件下载：', fileName);
+    // 实际下载代码需要服务器端支持
+  }
+
+  function renameFile(fileName) {
+    const newName = prompt('请输入新的文件名:', fileName);
+    if (newName) {
+      console.log('文件重命名为：', newName);
+      // 实际重命名代码需要服务器端支持
+    }
+  }
+
+  function deleteFile(fileName) {
+    if (confirm('确定要删除文件吗？')) {
+      console.log('文件删除：', fileName);
+      // 实际删除代码需要服务器端支持
+    }
+  }
+
+  // 跳转到管理中心的函数
+  function gotoManager() {
+    window.location.href = 'http://127.0.0.1:9092/manager';
+  }
+
+  // 初始化页面时显示文件列表
+  function displayFiles() {
+    fetch('http://127.0.0.1:9092/file/all')
+      .then(response => response.json())
+      .then(files => {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = ''; // 清空现有的文件列表
+        files.forEach(file => {
+          addFileToList(file);
+        });
+      })
+      .catch(error => {
+        console.error('获取文件列表失败', error);
+        alert('无法加载文件列表！');
+      });
+  }
+
+  // 添加文件到列表
+  function addFileToList(file) {
+    const fileList = document.getElementById('fileList');
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.innerHTML = `
+      <div class="file-info">
+        <span>${file.name}</span>
+        <span>${(file.size / 1024).toFixed(2)} KB</span>
+      </div>
+      <div class="file-actions">
+        <button onclick="downloadFile('${file.name}')">下载</button>
+        <button onclick="renameFile('${file.name}')">重命名</button>
+        <button onclick="deleteFile('${file.name}')">删除</button>
+      </div>
+    `;
+    fileList.appendChild(fileItem);
+  }
+
+  // 页面加载完毕后，显示文件列表
+  window.onload = displayFiles;
+</script>
+</body>
+</html>
+
+ 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录界面</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  .login-container {
+    max-width: 360px;
+    margin: 50px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .login-container:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    color: #666;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-image: linear-gradient(to right, #5cb85c, #4cae4c);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-image: linear-gradient(to right, #4cae4c, #5cb85c);
+  }
+
+  button:first-child {
+    margin-right: 10px;
+  }
+
+  button:last-child {
+    margin-left: 10px;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <h1>登录</h1>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">用户名:</label>
+      <input type="text" placeholder="请输入用户名" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">密码:</label>
+      <input type="password" placeholder="请输入密码" id="password" required>
+    </div>
+    <div class="button-container">
+      <button type="button" onclick="goToRegister()">注册</button>
+      <button type="submit">登录</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('loginForm').onsubmit = function(event) {
+    event.preventDefault();
+
+    // 获取用户输入的凭证
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+
+    // 构造请求体
+    var data = {
+      username: username,
+      password: password
+    };
+
+    // 发送POST请求到登录API
+    fetch('http://localhost:9092/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      // 检查响应状态
+      if (!response.ok) {
+        throw new Error('登录失败，状态码：' + response.status);
+      }
+      return response.json(); // 解析JSON响应体
+    })
+    .then(data => {
+      // 登录成功，可以在这里处理返回的数据
+      console.log('登录成功', data);
+      // 跳转到主页或另一个页面
+      window.location.href = '/sx2/panmanager.html';
+    })
+    .catch(error => {
+      // 处理错误
+      console.error('登录过程中发生错误:', error);
+      alert('登录失败，请检查您的用户名和密码。');
+    });
+  };
+
+  function goToRegister() {
+    window.location.href = '/sx2/register.html';
+  }
+</script>
+
+</body>
+</html>
